@@ -1,4 +1,4 @@
-package com.github.introkafka.tutorial2;
+package introkafka.tutorial2;
 
 import com.google.common.collect.Lists;
 import com.twitter.hbc.ClientBuilder;
@@ -15,7 +15,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
@@ -26,7 +25,7 @@ public class TwitterProducer {
 
     Logger logger = LoggerFactory.getLogger(TwitterProducer.class.getName());
 
-    ArrayList<String> terms = Lists.newArrayList("kafka");
+    ArrayList<String> terms = Lists.newArrayList("bitcoin", "kafka", "usa", "politics", "basketball", "sport");
 
     String consumerKey = "4RqIwrIUQt7u3fbvZeS7w26Ta";
     String consumerSecret = "0P9Rzqs5v05ItYUgFUWM4Znu6rFpMUxxuQONhYRVlfNvHCTtdt";
@@ -119,8 +118,19 @@ public class TwitterProducer {
         properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
+        //create safe Producer
+        properties.setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+        properties.setProperty(ProducerConfig.ACKS_CONFIG, "all");
+        properties.setProperty(ProducerConfig.RETRIES_CONFIG, Integer.toString(Integer.MAX_VALUE));
+        properties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");
+
+        // high throughput producer (at the expense of a bit of latency and CPU usage)
+
         // create the producer
         KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
+        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
+        properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
+        properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32*1024));
 
         return producer;
     }

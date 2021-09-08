@@ -1,4 +1,4 @@
-package com.github.introkafka.tutorial2;
+package introkafka.tutorial2;
 
 public class TwitterConsumer {
 
